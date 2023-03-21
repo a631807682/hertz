@@ -86,8 +86,10 @@ func TestPoolVariousSizesSerial(t *testing.T) {
 }
 
 func TestPoolVariousSizesConcurrent(t *testing.T) {
+	testPoolVariousSizes(t)
+
 	concurrency := 5
-	ch := make(chan struct{})
+	ch := make(chan struct{}, concurrency)
 	for i := 0; i < concurrency; i++ {
 		go func() {
 			testPoolVariousSizes(t)
@@ -98,7 +100,7 @@ func TestPoolVariousSizesConcurrent(t *testing.T) {
 		select {
 		case <-ch:
 		case <-time.After(3 * time.Second):
-			t.Fatalf("timeout")
+			t.Fatalf("timeout on goroutine %d", i)
 		}
 	}
 }
