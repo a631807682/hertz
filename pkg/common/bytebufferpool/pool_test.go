@@ -89,16 +89,17 @@ func TestPoolVariousSizesConcurrent(t *testing.T) {
 	concurrency := 5
 	ch := make(chan struct{})
 	for i := 0; i < concurrency; i++ {
-		go func() {
+		go func(i int) {
 			testPoolVariousSizes(t)
+			t.Logf("testPoolVariousSizes finished %d", i)
 			ch <- struct{}{}
-		}()
+		}(i)
 	}
 	for i := 0; i < concurrency; i++ {
 		select {
 		case <-ch:
-		case <-time.After(3 * time.Second):
-			t.Fatalf("timeout")
+		case <-time.After(time.Second):
+			t.Fatalf("timeout i:%d", i)
 		}
 	}
 }
